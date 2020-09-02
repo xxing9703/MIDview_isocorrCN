@@ -131,7 +131,6 @@ filename=fullfile(path,file);
  else
      set(handles.text_msg,'String','Please wait......','BackgroundColor','r'); drawnow();
      A=readtable(filename,'readvariablename',true); %8/16/2020
-     A=A(1:length(find([A.medMz]>0)),:); %9/2/2020 cut empty rows in case user edited csv.
      handles.text_fname.String=filename;    
 
      start_col=15; %do not change
@@ -160,7 +159,8 @@ filename=fullfile(path,file);
      end
      
    % read formula, extra C/N number
-     for i=1:length(ID) %loop over metabolites        
+     for i=1:length(ID) %loop over metabolites
+        
         ids=find(A.metaGroupId==ID(i));    %7/17/2020
         A_sub=A(ids,:); %A_sub: data sheet for the selected metabolite ID 
         try  %8/16/2020  added warning message for incorrect formulas
