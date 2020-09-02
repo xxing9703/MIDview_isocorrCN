@@ -30,6 +30,8 @@ see readme.txt in https://github.com/xxing9703/isocorr13C15N for the basic use o
    2. user's choice to select viewing 1) absolute or relative, 2) before or after correction, 3) integrate along 13C or 15N.
    3. Grouping: user can group samples of replicates by giving them identical grpNames. By default, grpNames of each sample will be the sample name ignoring the strings after the last '_'. for example: 'day1_rep1', 'day1_rep2' will have the same grpName of 'day1'.
 
+ # interface 
+<img src="screenshot.png">
 
   
   
