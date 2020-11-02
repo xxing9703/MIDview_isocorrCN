@@ -131,6 +131,7 @@ filename=fullfile(path,file);
  else
      set(handles.text_msg,'String','Please wait......','BackgroundColor','r'); drawnow();
      A=readtable(filename,'readvariablename',true); %8/16/2020
+     A=A(1:length(find([A.medMz]>0)),:); %9/2/2020 cut empty rows in case user edited csv.
      handles.text_fname.String=filename;    
 
      start_col=15; %do not change
@@ -151,17 +152,25 @@ filename=fullfile(path,file);
      handles.text_ngroup.String=num2str(length(unique(grp_name)));
    % parse table data and store in meta  
      
-     ID=unique(A.metaGroupId,'stable');  %unique metabolite IDs // changed to use metaGroupId 7/17/2020
-     if length(ID)<=1         
-         [~,~,ids]=unique(A.compoundId,'stable');  %if no metaGroupId, change to compoundID and add metaGroupId
-         [A.metaGroupId]=ids;
-         ID=unique(A.metaGroupId,'stable');
-     end
+% % %      ID=unique(A.metaGroupId,'stable');  %unique metabolite IDs // changed to use metaGroupId 7/17/2020
+% % %      if length(ID)<=1         
+% % %          [~,~,ids]=unique(A.compoundId,'stable');  %if no metaGroupId, change to compoundID and add metaGroupId
+% % %          [A.metaGroupId]=ids;
+% % %          ID=unique(A.metaGroupId,'stable');
+% % %      end
+% % %      
+     grpHead=find(strcmp(A.isotopeLabel,'C12 PARENT'));
+     grpHead(end+1)=size(A,1)+1;
+     
+     
      
    % read formula, extra C/N number
-     for i=1:length(ID) %loop over metabolites
-        
-        ids=find(A.metaGroupId==ID(i));    %7/17/2020
+%      for i=1:length(ID) %loop over metabolites        
+%         ids=find(A.metaGroupId==ID(i));    %7/17/2020
+      for i=1:length(grpHead)-1          
+          ID(i)=i;          
+          ids= grpHead(i):grpHead(i+1)-1;
+          A.metaGroupId(ids)=ones(1,length(ids))*i;
         A_sub=A(ids,:); %A_sub: data sheet for the selected metabolite ID 
         try  %8/16/2020  added warning message for incorrect formulas
             [~,~,tp]=formula2mass(A_sub.formula{1});
