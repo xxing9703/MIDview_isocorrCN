@@ -22,7 +22,7 @@ function varargout = gui_isocorr(varargin)
 
 % Edit the above text to modify the response to help gui_isocorr
 
-% Last Modified by GUIDE v2.5 01-Sep-2020 23:45:18
+% Last Modified by GUIDE v2.5 30-Nov-2020 13:58:35
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -134,11 +134,12 @@ filename=fullfile(path,file);
      A=A(1:length(find([A.medMz]>0)),:); %9/2/2020 cut empty rows in case user edited csv.
      handles.text_fname.String=filename;    
 
-     start_col=15; %do not change
+     start_col=str2num(handles.edit_startcol.String); %intensity start column
   
      sample_name=A.Properties.VariableNames(start_col:end)';
      grp_name=sample_name;
-     % set default grpName: string before the last '_' of sample_name
+     % set grpName if autogrouping is checked: string before the last '_' of sample_name
+     if handles.checkbox_autogrouping.Value
      for i=1:length(sample_name)
          C=strsplit(sample_name{i},'_');
          if length(C)>1
@@ -146,10 +147,11 @@ filename=fullfile(path,file);
          else
              grp_name{i,1}=sample_name{i};
          end
-     end         
-       
+     end 
+     end
      handles.text_nsample.String=num2str(length(sample_name));
      handles.text_ngroup.String=num2str(length(unique(grp_name)));
+     
    % parse table data and store in meta  
      
      ID=unique(A.metaGroupId,'stable');  %unique metabolite IDs // changed to use metaGroupId 7/17/2020
@@ -228,6 +230,7 @@ filename=fullfile(path,file);
      handles.checkbox1.Value=0;
      handles.bt_report.Enable='off';
      handles.checkbox1.Enable='off';
+     handles.start_col=start_col;
 
      
    %pass variables  
@@ -494,3 +497,53 @@ function pushbutton6_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 figure('NumberTitle', 'off','name','legend color scheme')
 imshow('legend.png');
+
+
+% --- Executes on button press in checkbox_autogrouping.
+function checkbox_autogrouping_Callback(hObject, eventdata, handles)
+% hObject    handle to checkbox_autogrouping (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of checkbox_autogrouping
+ sample_name=handles.A.Properties.VariableNames(handles.start_col:end)';
+     grp_name=sample_name;
+     % set grpName if autogrouping is checked: string before the last '_' of sample_name
+     if handles.checkbox_autogrouping.Value
+     for i=1:length(sample_name)
+         C=strsplit(sample_name{i},'_');
+         if length(C)>1
+             grp_name{i,1}=sample_name{i}(1:length(sample_name{i})-length(C{end})-1);
+         else
+             grp_name{i,1}=sample_name{i};
+         end
+     end 
+     end
+     handles.text_nsample.String=num2str(length(sample_name));
+     handles.text_ngroup.String=num2str(length(unique(grp_name)));
+     handles.grp_name=grp_name;
+     handles.uitable2.Data=[sample_name,grp_name];
+     guidata(hObject, handles);
+
+
+
+function edit_startcol_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_startcol (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_startcol as text
+%        str2double(get(hObject,'String')) returns contents of edit_startcol as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_startcol_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_startcol (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end

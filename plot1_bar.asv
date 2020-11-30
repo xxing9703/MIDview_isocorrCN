@@ -22,7 +22,7 @@ end
 bar(axe,x,y','stacked');
 set(axe,'TickLabelInterpreter','none')
 hold (axe,'on')
-if length(x)<length(grp_name)  %show errorbars 
+if length(x)<  %show errorbars 
  if size(y,1)==1
   errorbar(axe,y,err','.k');
  else
