@@ -131,11 +131,18 @@ filename=fullfile(path,file);
  else
      set(handles.text_msg,'String','Please wait......','BackgroundColor','r'); drawnow();
      A=readtable(filename,'readvariablename',true); %8/16/2020
-     A=A(1:length(find([A.medMz]>0)),:); %9/2/2020 cut empty rows in case user edited csv.
+     A=A(1:length(find([A.medMz]>0)),:); %9/2/2020 cut empty rows in case user edited csv.     
      handles.text_fname.String=filename;    
-
      start_col=str2num(handles.edit_startcol.String); %intensity start column
-  
+     % remove columns with NA in data block starting from start_col
+     ind=1:start_col-1;
+     for i=start_col:size(A,2)
+         if isnumeric(A{1,i})
+            ind=[ind,i];
+         end
+     end 
+     A=A(:,ind);
+     %--added 12/1/2021
      sample_name=A.Properties.VariableNames(start_col:end)';
      grp_name=sample_name;
      % set grpName if autogrouping is checked: string before the last '_' of sample_name
